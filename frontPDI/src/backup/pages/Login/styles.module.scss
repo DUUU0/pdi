@@ -1,0 +1,92 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f7f6;
+    font-family: 'Inter', sans-serif;
+}
+
+.loginCard {
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+
+    h1 {
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-size: 1.8rem;
+    }
+
+    p {
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+
+    .inputGroup {
+        text-align: left;
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #444;
+            font-size: 0.85rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+
+            &:focus {
+                outline: none;
+                border-color: #007bff;
+            }
+        }
+    }
+
+    .loginButton {
+        background-color: #007bff;
+        color: white;
+        padding: 0.9rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &:hover {
+            background-color: #0056b3;
+        }
+
+        &:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.errorMessage {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 0.7rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}

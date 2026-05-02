@@ -1,0 +1,225 @@
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.templateWindow {
+    background: #f8fafc;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.windowHeader {
+    background: #1a202c;
+    color: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .titleGroup {
+        h1 {
+            font-size: 1.25rem;
+            margin: 0 0 4px;
+            font-weight: 600;
+        }
+
+        .idBadge {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+    }
+
+    .closeBtn {
+        background: transparent;
+        border: none;
+        color: #cbd5e0;
+        font-size: 2rem;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+
+        &:hover {
+            color: white;
+        }
+    }
+}
+
+.scrollContent {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* ── Card genérico ── */
+.infoCard {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+
+    .cardHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 10px;
+
+        h3 {
+            font-size: 1rem;
+            color: #2d3748;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .editLink {
+            background: none;
+            border: none;
+            color: #3182ce;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+/* ── Grid de informações ── */
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.infoItem {
+    label {
+        display: block;
+        font-size: 0.72rem;
+        color: #718096;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 4px;
+    }
+
+    p {
+        font-size: 0.95rem;
+        color: #1a202c;
+        font-weight: 500;
+        margin: 0;
+        word-break: break-word;
+    }
+}
+
+/* Ocupa linha inteira dentro do infoGrid */
+.fullWidth {
+    grid-column: 1 / -1;
+}
+
+/* ── Biometria ── */
+.biometriaGrid {
+    display: flex;
+    gap: 20px;
+    justify-content: space-around;
+
+    .photoBox {
+        text-align: center;
+        flex: 1;
+
+        span {
+            display: block;
+            font-size: 0.75rem;
+            color: #718096;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        img {
+            width: 100%;
+            max-width: 180px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .noPhoto {
+            height: 220px;
+            background: #edf2f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a0aec0;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            border: 1px dashed #cbd5e0;
+        }
+    }
+}
+
+/* ── Anomalias ── */
+.obsList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .obsItem {
+        font-size: 0.9rem;
+        color: #4a5568;
+        line-height: 1.6;
+        padding: 10px 14px;
+        background: #f8fafc;
+        border-radius: 6px;
+        border-left: 3px solid #e2e8f0;
+
+        strong {
+            color: #2d3748;
+            margin-right: 6px;
+        }
+    }
+}
+
+/* ── Footer ── */
+.windowFooter {
+    padding: 15px 30px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+
+    .closeBtnFooter {
+        background: #e2e8f0;
+        color: #4a5568;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+
+        &:hover {
+            background: #cbd5e0;
+        }
+    }
+}

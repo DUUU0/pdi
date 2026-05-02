@@ -1,0 +1,84 @@
+// Importa as variáveis de cor e estrutura do Dashboard
+@import "../Dashboard/Dashboard.module.scss";
+
+.container {
+    // ... estilos anteriores ...
+
+    .viewBtn {
+        background-color: #3182ce;
+        color: #ffffff;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        margin: 0 auto;
+
+        &:hover {
+            background: #2b6cb0;
+            transform: translateY(-1px);
+        }
+    }
+}
+
+.textCenter {
+    text-align: center;
+}
+
+// Estilos de Badge para similaridade
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.highMatch {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.lowMatch {
+    background: #feebc8;
+    color: #744210;
+}
+
+// No arquivo Monitoramento.module.scss
+
+.backBtn {
+    background: #2d3748; // Cinza escuro para diferenciar de ações de criação
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    // Estilização do ícone de seta (usando o pseudo-elemento ::before para garantir o ícone)
+    &::before {
+        content: '←';
+        font-size: 1.1rem;
+    }
+
+    &:hover {
+        background: #1a202c;
+        transform: translateX(-3px); // Efeito de deslize para a esquerda
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+        transform: translateX(0);
+    }
+}

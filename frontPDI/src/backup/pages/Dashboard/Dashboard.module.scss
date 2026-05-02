@@ -1,0 +1,229 @@
+.container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    .dashboardHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2.5rem;
+        gap: 20px;
+
+        .titleSection {
+            h2 {
+                color: #1a202c;
+                margin: 0;
+                font-size: 1.8rem;
+                border-left: 5px solid #3182ce;
+                padding-left: 15px;
+            }
+
+            p {
+                color: #718096;
+                margin: 5px 0 0 15px;
+                font-size: 0.9rem;
+            }
+        }
+    }
+}
+
+.topActions {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    .buttonGroup {
+        display: flex;
+        gap: 10px;
+
+        // Estilização global para links que envolvem botões
+        a {
+            text-decoration: none;
+        }
+    }
+
+    .createBtn,
+    .monitorBtn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        transition: all 0.2s;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        .icon {
+            font-size: 1.1rem;
+        }
+    }
+
+    .createBtn {
+        background: #2f855a;
+        color: white;
+
+        &:hover {
+            background: #276749;
+            transform: translateY(-1px);
+        }
+    }
+
+    .monitorBtn {
+        background: #2d3748;
+        color: white;
+
+        &:hover {
+            background: #1a202c;
+            transform: translateY(-1px);
+        }
+    }
+}
+
+.searchBox {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    .searchInput {
+        padding: 11px 20px;
+        width: 320px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #fff;
+        outline: none;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s;
+
+        &:focus {
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+    }
+
+    .resultCount {
+        font-size: 0.7rem;
+        color: #a0aec0;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+.tableWrapper {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #edf2f7;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+        background: #f8fafc;
+        padding: 1.2rem;
+        text-align: left;
+        color: #4a5568;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    td {
+        padding: 1.2rem;
+        border-top: 1px solid #edf2f7;
+        color: #2d3748;
+    }
+
+    .boldText {
+        font-weight: 600;
+        color: #1a202c;
+    }
+
+    .textCenter {
+        text-align: center;
+    }
+
+    // Botão Ver Template (Azul Escuro Sólido)
+    .viewBtn {
+        background-color: #3182ce;
+        color: #ffffff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        margin: 0 auto; // Centraliza se o container for textCenter
+
+        &:hover {
+            background: #2b6cb0;
+            box-shadow: 0 4px 10px rgba(49, 130, 206, 0.25);
+            transform: translateY(-1px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+}
+
+.noResults {
+    text-align: center;
+    padding: 3rem !important;
+    color: #a0aec0;
+    font-style: italic;
+}
+
+// Media Queries de Responsividade
+@media (max-width: 1024px) {
+    .container .dashboardHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 30px;
+    }
+
+    .topActions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+
+        .buttonGroup {
+            width: 100%;
+
+            button {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        .searchBox {
+            align-items: flex-start;
+
+            .searchInput {
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .table {
+
+        th:nth-child(2),
+        td:nth-child(2) {
+            display: none; // Esconde CPF em telas muito pequenas para focar no nome e ação
+        }
+    }
+}

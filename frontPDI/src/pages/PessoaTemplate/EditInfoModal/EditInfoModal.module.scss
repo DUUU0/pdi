@@ -1,0 +1,226 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+    backdrop-filter: blur(5px);
+}
+
+.modal {
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modalHeader {
+    background: #1a202c;
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+        font-size: 1.1rem;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .closeX {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+}
+
+.scrollFields {
+    padding: 25px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Grid de 2 colunas para pessoa e características */
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Campo individual dentro do grid */
+.inputField {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    label {
+        font-weight: 600;
+        font-size: 0.78rem;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    input,
+    textarea {
+        padding: 9px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        color: #1a202c;
+        background: #fff;
+        transition: border-color 0.15s;
+
+        &:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+        }
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 70px;
+    }
+}
+
+/* Ocupa as 2 colunas no grid */
+.fullWidth {
+    grid-column: 1 / -1;
+}
+
+/* Coluna única para anomalias */
+.formColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+        font-weight: 600;
+        font-size: 0.78rem;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-top: 10px;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    textarea {
+        padding: 10px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        color: #1a202c;
+        min-height: 80px;
+        resize: vertical;
+        transition: border-color 0.15s;
+
+        &:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+        }
+    }
+}
+
+.actions {
+    padding: 18px 25px;
+    background: #f8fafc;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #e2e8f0;
+
+    .cancelBtn {
+        background: #e2e8f0;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        color: #4a5568;
+        transition: background 0.15s;
+
+        &:hover {
+            background: #cbd5e0;
+        }
+    }
+
+    .saveBtn {
+        background: #3182ce;
+        color: white;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.15s;
+
+        &:hover:not(:disabled) {
+            background: #2b6cb0;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
+
+/* Biometria */
+.biometriaUploadGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.uploadItem {
+    display: flex;
+    flex-direction: column;
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+
+    label {
+        font-weight: 600;
+        font-size: 0.78rem;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 8px;
+    }
+
+    input[type='file'] {
+        font-size: 0.85rem;
+    }
+}
+
+.preview {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    margin-top: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}

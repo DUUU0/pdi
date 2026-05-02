@@ -1,0 +1,218 @@
+/* CadastroPessoa.module.scss */
+
+.appContainer {
+    min-height: 100vh;
+    background-color: #f4f6f8;
+}
+
+// Estilo de Header copiado para manter a consistência visual
+.globalHeader {
+    background-color: #1a202c;
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .logo {
+        color: #fff;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .navLinks {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+
+        a {
+            color: #cbd5e0;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+
+            &:hover {
+                color: #fff;
+            }
+
+            &.active {
+                color: #63b3ed;
+            }
+
+            &.btnAction {
+                background: #3182ce;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 4px;
+
+                &:hover {
+                    background: #2b6cb0;
+                }
+
+                &.active {
+                    background: #2b6cb0;
+                    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+                }
+            }
+        }
+    }
+}
+
+.container {
+    padding: 2.5rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 1rem;
+
+    .titleSection {
+        h2 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 1.6rem;
+            border-left: 5px solid #3182ce;
+            padding-left: 15px;
+        }
+
+        p {
+            margin: 5px 0 0 15px;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+    }
+}
+
+.formCard {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #edf2f7;
+}
+
+.inputGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+
+    @media (max-width: 650px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #4a5568;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    input {
+        padding: 10px 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: #f8fafc;
+        color: #2d3748;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+
+        &::placeholder {
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        &:focus {
+            border-color: #3182ce;
+            background: #fff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+    }
+}
+
+.formFooter {
+    margin-top: 35px;
+    padding-top: 20px;
+    border-top: 1px solid #edf2f7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (max-width: 650px) {
+        flex-direction: column;
+        gap: 20px;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .infoText {
+        color: #a0aec0;
+        font-size: 0.8rem;
+        font-style: italic;
+        margin: 0;
+    }
+}
+
+.buttonArea {
+    display: flex;
+    gap: 15px;
+}
+
+.submitBtn {
+    background-color: #3182ce;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: #2b6cb0;
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &:disabled {
+        background-color: #a0aec0;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+.cancelBtn {
+    background-color: transparent;
+    color: #4a5568;
+    padding: 10px 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: #edf2f7;
+        color: #2d3748;
+    }
+}
