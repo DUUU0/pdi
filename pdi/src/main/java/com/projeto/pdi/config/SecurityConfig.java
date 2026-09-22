@@ -42,7 +42,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // Garante que todas as rotas necessárias para o monitoramento e login estejam abertas
-                        .requestMatchers("/auth/**", "/pessoas/**", "/pessoa/**", "/caracteristicas/**", "/biometria/**", "/anomalias/**").permitAll()
+                        .requestMatchers("/auth/**", "/pessoas/**", "/pessoa/**", "/caracteristicas/**", "/biometria/**", "/anomalias/**", "/api/aparicoes/**").permitAll()
                         .anyRequest().authenticated()
                 );
                 /*.csrf(csrf -> csrf.disable())

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './PessoaTemplate.module.scss';
 import { apiClient } from '../../services/api';
 import EditInfoModal from './EditInfoModal/EditInfoModal';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     pessoa: any;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
+    const navigate = useNavigate();
     const [dadosPessoa, setDadosPessoa] = useState(pessoa);
     const [caracteristicas, setCaracteristicas] = useState<any>({});
     const [anomalias, setAnomalias] = useState<any>({});
@@ -230,6 +232,12 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
                 </div>
 
                 <footer className={styles.windowFooter}>
+                    <button
+                        className={styles.closeBtnFooter}
+                        onClick={() => { onClose(); navigate(`/mapa?pessoa=${pessoa.id}`); }}
+                    >
+                        Ver no Mapa
+                    </button>
                     <button className={styles.closeBtnFooter} onClick={onClose}>Fechar Ficha</button>
                 </footer>
             </div>

@@ -44,6 +44,7 @@ const Dashboard: React.FC = () => {
                 <nav className={styles.navLinks}>
                     <Link to="/dashboard" className={styles.active}>Dashboard</Link>
                     <Link to="/supervisao">Supervisão</Link>
+                    <Link to="/mapa">Mapa</Link>
                     <Link to="/nf">Registro Agências</Link>
                     <Link to="/cadastro-pessoa" className={styles.btnAction}>+ Novo Registro</Link>
                 </nav>
