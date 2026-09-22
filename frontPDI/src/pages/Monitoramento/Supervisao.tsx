@@ -57,6 +57,7 @@ const Supervisao: React.FC = () => {
                 <nav className={styles.navLinks}>
                     <Link to="/dashboard">Dashboard</Link>
                     <Link to="/supervisao" className={styles.active}>Supervisão</Link>
+                    <Link to="/mapa">Mapa</Link>
                     <Link to="/nf">Registro Agências</Link>
                     <Link to="/cadastro-pessoa" className={styles.btnAction}>+ Novo Registro</Link>
                 </nav>
@@ -86,19 +87,21 @@ const Supervisao: React.FC = () => {
                                 <th>Data e Hora</th>
                                 <th>Identificado</th>
                                 <th>CPF</th>
+                                <th>Local</th>
                                 <th className={styles.textCenter}>Grau de Certeza</th>
                                 <th className={styles.textCenter}>Ação</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={5} className={styles.noResults}>Buscando...</td></tr>
+                                <tr><td colSpan={6} className={styles.noResults}>Buscando...</td></tr>
                             ) : aparicoesFiltradas.length > 0 ? (
                                 aparicoesFiltradas.map((a: any) => (
                                     <tr key={a.id}>
                                         <td className={styles.dateText}>{formatarData(a.dataHora)}</td>
                                         <td className={styles.boldText}>{a.nome}</td>
                                         <td>{a.cpf}</td>
+                                        <td>{a.local || '---'}</td>
                                         <td className={styles.textCenter}>
                                             <span className={`${styles.badge} ${a.similaridade > 80 ? styles.highMatch : styles.lowMatch}`}>
                                                 {Number(a.similaridade).toFixed(1)}%
@@ -112,7 +115,7 @@ const Supervisao: React.FC = () => {
                                     </tr>
                                 ))
                             ) : (
-                                <tr><td colSpan={5} className={styles.noResults}>Nenhuma ocorrência.</td></tr>
+                                <tr><td colSpan={6} className={styles.noResults}>Nenhuma ocorrência.</td></tr>
                             )}
                         </tbody>
                     </table>

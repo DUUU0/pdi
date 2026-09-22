@@ -5,6 +5,7 @@ import com.projeto.pdi.dtos.PessoaResponseDto;
 import com.projeto.pdi.models.Pessoa;
 import com.projeto.pdi.repositories.PessoaRepository;
 import com.projeto.pdi.repositories.UserRepository;
+import com.projeto.pdi.validation.PessoaValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,9 +28,12 @@ public class PessoaController {
     private UserRepository userRepository;
 
     @PostMapping
-    public ResponseEntity<PessoaResponseDto> createPessoa(@RequestBody PessoaRequestDto dto) {
+    public ResponseEntity<Object> createPessoa(@RequestBody PessoaRequestDto dto) {
+        ResponseEntity<Object> erro = validar(dto, null);
+        if (erro != null) return erro;
+
         Pessoa pessoa = new Pessoa();
-        BeanUtils.copyProperties(dto, pessoa);
+        BeanUtils.copyProperties(normalizar(dto), pessoa);
 
         userRepository.findById(dto.criadoPorId()).ifPresent(user -> {
             pessoa.setCriadoPor(user.getId().intValue());
@@ -45,8 +50,11 @@ public class PessoaController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
         }
 
+        ResponseEntity<Object> erro = validar(dto, id);
+        if (erro != null) return erro;
+
         Pessoa pessoa = pessoaOptional.get();
-        BeanUtils.copyProperties(dto, pessoa, "id", "createdAt");
+        BeanUtils.copyProperties(normalizar(dto), pessoa, "id", "createdAt");
 
         userRepository.findById(dto.criadoPorId()).ifPresent(user -> {
             pessoa.setAtualizadoPor(user.getId().intValue());
@@ -78,6 +86,40 @@ public class PessoaController {
         }
         pessoaRepository.deleteById(id);
         return ResponseEntity.ok("Removido com sucesso");
+    }
+
+    // Retorna 400/409 com os erros por campo ({ "erros": { "cpf": "..." } }), ou null se os dados forem válidos
+    private ResponseEntity<Object> validar(PessoaRequestDto dto, Long idAtual) {
+        Map<String, String> erros = PessoaValidator.validar(dto);
+        if (!erros.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("erros", erros));
+        }
+
+        String cpf = PessoaValidator.formatarCpf(dto.cpf());
+        if (cpf != null) {
+            // Compara com e sem pontuação, pois registros antigos podem ter sido gravados sem máscara
+            List<String> formatos = List.of(cpf, PessoaValidator.somenteDigitosOuNulo(cpf));
+            if (pessoaRepository.existsByCpfInAndIdNot(formatos, idAtual == null ? -1L : idAtual)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of("erros", Map.of("cpf", "Já existe uma pessoa cadastrada com este CPF.")));
+            }
+        }
+        return null;
+    }
+
+    // Padroniza os documentos antes de gravar (CPF com máscara, CNH só dígitos, RG/passaporte em maiúsculas)
+    private PessoaRequestDto normalizar(PessoaRequestDto dto) {
+        return new PessoaRequestDto(
+                PessoaValidator.textoOuNulo(dto.nome()),
+                dto.dataNascimento(),
+                PessoaValidator.textoOuNulo(dto.localNascimento()),
+                PessoaValidator.maiusculoOuNulo(dto.rg()),
+                PessoaValidator.formatarCpf(dto.cpf()),
+                PessoaValidator.maiusculoOuNulo(dto.passaporte()),
+                PessoaValidator.somenteDigitosOuNulo(dto.cnh()),
+                dto.criadoPorId(),
+                dto.atualizadoPorId()
+        );
     }
 
     private PessoaResponseDto mapToResponse(Pessoa p) {

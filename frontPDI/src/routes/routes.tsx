@@ -3,6 +3,7 @@ import Login from "../pages/Login/login";
 import Dashboard from "../pages/Dashboard/dashboard";
 import CadastroPessoa from "../pages/CadastroPessoa/CadastroPessoa";
 import Monitoramento from "../pages/Monitoramento/Supervisao";
+import Mapa from "../pages/Mapa/Mapa";
 
 function RoutesApp() {
     return (
@@ -21,6 +22,10 @@ function RoutesApp() {
 
             <Routes>
                 <Route path="/supervisao" element={<Monitoramento />} />
+            </Routes>
+
+            <Routes>
+                <Route path="/mapa" element={<Mapa />} />
             </Routes>
         </BrowserRouter>
     );

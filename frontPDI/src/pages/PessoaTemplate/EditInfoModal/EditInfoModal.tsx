@@ -1,6 +1,26 @@
 import React, { useState } from 'react';
 import { apiClient } from '../../../services/api';
 import styles from './EditInfoModal.module.scss';
+import {
+    aplicarMascara,
+    DATA_NASCIMENTO_MINIMA,
+    errosDaResposta,
+    hojeIso,
+    validarCampo,
+    validarPessoa,
+    type DadosPessoa,
+    type ErrosPessoa,
+} from '../../../utils/validacaoPessoa';
+
+const CAMPOS_PESSOA: { name: keyof DadosPessoa; label: string; placeholder?: string; type?: string; fullWidth?: boolean }[] = [
+    { name: 'nome', label: 'Nome' },
+    { name: 'cpf', label: 'CPF', placeholder: '000.000.000-00' },
+    { name: 'rg', label: 'RG', placeholder: 'Ex.: 12.345.678-9' },
+    { name: 'passaporte', label: 'Passaporte', placeholder: 'Ex.: FZ123456' },
+    { name: 'cnh', label: 'CNH', placeholder: '11 dígitos' },
+    { name: 'dataNascimento', label: 'Data de Nascimento', type: 'date' },
+    { name: 'localNascimento', label: 'Local de Nascimento', fullWidth: true },
+];
 
 interface EditProps {
     type: string;
@@ -12,6 +32,7 @@ interface EditProps {
 const EditInfoModal: React.FC<EditProps> = ({ type, pessoaId, data, onClose }) => {
     const [formData, setFormData] = useState({ ...data, pessoaId: pessoaId });
     const [loading, setLoading] = useState(false);
+    const [erros, setErros] = useState<ErrosPessoa>({});
 
     const getRoute = () => {
         switch (type) {
@@ -26,6 +47,12 @@ const EditInfoModal: React.FC<EditProps> = ({ type, pessoaId, data, onClose }) =
     const set = (field: string, value: any) =>
         setFormData((prev: any) => ({ ...prev, [field]: value }));
 
+    // Dados pessoais: aplica a máscara e limpa o erro enquanto o usuário corrige
+    const setPessoaCampo = (field: keyof DadosPessoa, value: string) => {
+        set(field, aplicarMascara(field, value));
+        if (erros[field]) setErros(prev => ({ ...prev, [field]: undefined }));
+    };
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -36,6 +63,12 @@ const EditInfoModal: React.FC<EditProps> = ({ type, pessoaId, data, onClose }) =
     };
 
     const handleSave = async () => {
+        if (type === 'pessoa') {
+            const errosValidacao = validarPessoa(formData);
+            setErros(errosValidacao);
+            if (Object.keys(errosValidacao).length > 0) return;
+        }
+
         setLoading(true);
         const payload = {
             ...formData,
@@ -49,6 +82,11 @@ const EditInfoModal: React.FC<EditProps> = ({ type, pessoaId, data, onClose }) =
             onClose();
         } catch (e: any) {
             console.error('Erro ao salvar:', e.response?.data);
+            const errosBackend = errosDaResposta(e);
+            if (errosBackend) {
+                setErros(errosBackend);
+                return;
+            }
             const errorMsg = e.response?.data?.message || e.response?.data || 'Erro desconhecido';
             alert(`Falha ao salvar: ${errorMsg}`);
         } finally {
@@ -76,34 +114,22 @@ const EditInfoModal: React.FC<EditProps> = ({ type, pessoaId, data, onClose }) =
                     {/* ── PESSOA ── */}
                     {type === 'pessoa' && (
                         <div className={styles.formGrid}>
-                            <div className={styles.inputField}>
-                                <label>Nome</label>
-                                <input type="text" value={formData.nome || ''} onChange={e => set('nome', e.target.value)} />
-                            </div>
-                            <div className={styles.inputField}>
-                                <label>CPF</label>
-                                <input type="text" value={formData.cpf || ''} onChange={e => set('cpf', e.target.value)} />
-                            </div>
-                            <div className={styles.inputField}>
-                                <label>RG</label>
-                                <input type="text" value={formData.rg || ''} onChange={e => set('rg', e.target.value)} />
-                            </div>
-                            <div className={styles.inputField}>
-                                <label>Passaporte</label>
-                                <input type="text" value={formData.passaporte || ''} onChange={e => set('passaporte', e.target.value)} />
-                            </div>
-                            <div className={styles.inputField}>
-                                <label>CNH</label>
-                                <input type="text" value={formData.cnh || ''} onChange={e => set('cnh', e.target.value)} />
-                            </div>
-                            <div className={styles.inputField}>
-                                <label>Data de Nascimento</label>
-                                <input type="date" value={formData.dataNascimento || ''} onChange={e => set('dataNascimento', e.target.value)} />
-                            </div>
-                            <div className={`${styles.inputField} ${styles.fullWidth}`}>
-                                <label>Local de Nascimento</label>
-                                <input type="text" value={formData.localNascimento || ''} onChange={e => set('localNascimento', e.target.value)} />
-                            </div>
+                            {CAMPOS_PESSOA.map((campo) => (
+                                <div key={campo.name} className={`${styles.inputField} ${campo.fullWidth ? styles.fullWidth : ''}`}>
+                                    <label>{campo.label}</label>
+                                    <input
+                                        type={campo.type ?? 'text'}
+                                        value={formData[campo.name] || ''}
+                                        placeholder={campo.placeholder}
+                                        onChange={e => setPessoaCampo(campo.name, e.target.value)}
+                                        onBlur={() => setErros(prev => ({ ...prev, [campo.name]: validarCampo(campo.name, formData[campo.name]) }))}
+                                        className={erros[campo.name] ? styles.inputInvalid : ''}
+                                        aria-invalid={!!erros[campo.name]}
+                                        {...(campo.type === 'date' ? { min: DATA_NASCIMENTO_MINIMA, max: hojeIso() } : {})}
+                                    />
+                                    {erros[campo.name] && <span className={styles.fieldError}>{erros[campo.name]}</span>}
+                                </div>
+                            ))}
                         </div>
                     )}
 

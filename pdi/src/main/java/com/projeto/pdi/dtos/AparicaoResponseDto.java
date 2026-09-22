@@ -8,5 +8,8 @@ public record AparicaoResponseDto(Long id,            // ID da Aparição
                                   String nome,
                                   String cpf,
                                   LocalDateTime dataHora,
-                                  BigDecimal similaridade) {
+                                  BigDecimal similaridade,
+                                  String local,       // Descrição do local/câmera onde foi vista
+                                  BigDecimal latitude,
+                                  BigDecimal longitude) {
 }

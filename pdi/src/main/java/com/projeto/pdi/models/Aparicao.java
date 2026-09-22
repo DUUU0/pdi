@@ -18,8 +18,13 @@ public class Aparicao {
     @Column(name = "pessoa_id")
     private Integer pessoaId;
 
-    @Column(name = "data_hora", insertable = false, updatable = false)
+    @Column(name = "data_hora", updatable = false)
     private LocalDateTime dataHora;
 
     private BigDecimal similaridade;
+
+    // Localização onde a pessoa foi vista
+    private String local;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
 }
