@@ -9,12 +9,24 @@ interface Props {
     onClose: () => void;
 }
 
+type Historico = {
+    id: number;
+    userId: number | null;
+    nomeUsuario: string | null;
+    dataAlteracao: string;
+    tipoOperacao: 'CREATE' | 'UPDATE' | 'DELETE';
+    dadosAnteriores: string | null;
+    dadosNovos: string | null;
+};
+
 const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
     const navigate = useNavigate();
     const [dadosPessoa, setDadosPessoa] = useState(pessoa);
     const [caracteristicas, setCaracteristicas] = useState<any>({});
     const [anomalias, setAnomalias] = useState<any>({});
     const [biometria, setBiometria] = useState<any>({});
+    const [historico, setHistorico] = useState<Historico[]>([]);
+    const [erroHistorico, setErroHistorico] = useState(false);
 
     const [editModal, setEditModal] = useState<{ open: boolean; type: string }>({ open: false, type: '' });
     
@@ -27,15 +39,22 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
             const resPessoa = await apiClient.get(`/pessoas/${pessoa.id}`);
             setDadosPessoa(resPessoa.data);
 
-            const [resCarac, resAnom, resBio] = await Promise.allSettled([
+            const [resCarac, resAnom, resBio, resHistorico] = await Promise.allSettled([
                 apiClient.get(`/caracteristicas/pessoa/${pessoa.id}`),
                 apiClient.get(`/anomalias/pessoa/${pessoa.id}`),
-                apiClient.get(`/biometria/pessoa/${pessoa.id}`)
+                apiClient.get(`/biometria/pessoa/${pessoa.id}`),
+                apiClient.get<Historico[]>(`/historico/pessoa/${pessoa.id}`)
             ]);
 
             if (resCarac.status === 'fulfilled') setCaracteristicas(resCarac.value.data || {});
             if (resAnom.status === 'fulfilled') setAnomalias(resAnom.value.data || {});
             if (resBio.status === 'fulfilled') setBiometria(resBio.value.data || {});
+            if (resHistorico.status === 'fulfilled') {
+                setHistorico(resHistorico.value.data || []);
+                setErroHistorico(false);
+            } else {
+                setErroHistorico(true);
+            }
         } catch (e) {
             console.error('Erro ao carregar detalhes');
         }
@@ -58,6 +77,16 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
             default: return {};
         }
     };
+
+    const formatarData = (data: string) => new Intl.DateTimeFormat('pt-BR', {
+        dateStyle: 'short', timeStyle: 'medium'
+    }).format(new Date(data));
+
+    const rotuloOperacao = (operacao: Historico['tipoOperacao']) => ({
+        CREATE: 'Criou',
+        UPDATE: 'Atualizou',
+        DELETE: 'Excluiu',
+    })[operacao] ?? operacao;
 
     // Chave opcional (https://enter.pollinations.ai/keys) definida em .env.local; sem ela, usa o endpoint anônimo
     const POLLINATIONS_KEY = import.meta.env.VITE_POLLINATIONS_KEY as string | undefined;
@@ -228,6 +257,25 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
                             <div className={styles.obsItem}><strong>Adquirida:</strong> {anomalias.adquirida || 'Nenhuma registrada.'}</div>
                             <div className={styles.obsItem}><strong>Comportamental:</strong> {anomalias.comportamental || 'Nenhuma registrada.'}</div>
                         </div>
+                    </section>
+
+                    <section className={styles.infoCard}>
+                        <div className={styles.cardHeader}>
+                            <h3>Histórico de alterações</h3>
+                        </div>
+                        {erroHistorico && <p className={styles.historyMessage}>Não foi possível carregar o histórico.</p>}
+                        {!erroHistorico && historico.length === 0 && <p className={styles.historyMessage}>Nenhuma alteração registrada.</p>}
+                        {historico.length > 0 && (
+                            <ul className={styles.historyList}>
+                                {historico.map((item) => (
+                                    <li key={item.id}>
+                                        <span className={styles.historyOperation}>{rotuloOperacao(item.tipoOperacao)}</span>
+                                        <span>{item.nomeUsuario || 'Usuário não identificado'}</span>
+                                        <time dateTime={item.dataAlteracao}>{formatarData(item.dataAlteracao)}</time>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </section>
                 </div>
 

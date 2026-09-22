@@ -201,6 +201,43 @@
 }
 
 /* ── Footer ── */
+.historyMessage {
+    color: #718096;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.historyList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+        align-items: center;
+        background: #f8fafc;
+        border-left: 3px solid #3182ce;
+        color: #4a5568;
+        display: grid;
+        font-size: 0.9rem;
+        gap: 12px;
+        grid-template-columns: 95px 1fr auto;
+        padding: 10px 14px;
+
+        time {
+            color: #718096;
+            font-size: 0.8rem;
+        }
+    }
+}
+
+.historyOperation {
+    color: #2d3748;
+    font-weight: 700;
+}
+
 .windowFooter {
     padding: 15px 30px;
     background: white;

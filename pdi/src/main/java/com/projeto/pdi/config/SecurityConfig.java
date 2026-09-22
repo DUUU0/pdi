@@ -1,6 +1,7 @@
 package com.projeto.pdi.config;
 
-import com.projeto.pdi.security.JwtFilter;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import com.projeto.pdi.security.JwtFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -31,35 +32,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Ativa o CORS usando a configuração definida abaixo
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // 2. Desabilita o CSRF (necessário para APIs Stateless)
                 .csrf(csrf -> csrf.disable())
-
-                // 3. Define a política de sessão como Stateless (opcional, mas recomendado para JWT)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                .authorizeHttpRequests(auth -> auth
-                        // Garante que todas as rotas necessárias para o monitoramento e login estejam abertas
-                        .requestMatchers("/auth/**", "/pessoas/**", "/pessoa/**", "/caracteristicas/**", "/biometria/**", "/anomalias/**", "/api/aparicoes/**").permitAll()
-                        .anyRequest().authenticated()
-                );
-                /*.csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/pessoas/**").permitAll()
-                        .requestMatchers("/pessoa/**").permitAll()
-
-                        .requestMatchers("/admin/**").hasAuthority("admin")
-                        .requestMatchers("/editor/**").hasAuthority("editor")
-                        .requestMatchers("/view/**").hasAuthority("vizualizador")
-
+                        .requestMatchers("/api/aparicoes/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);*/
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

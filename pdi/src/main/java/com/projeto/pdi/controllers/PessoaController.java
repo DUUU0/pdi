@@ -1,21 +1,31 @@
 package com.projeto.pdi.controllers;
 
-import com.projeto.pdi.dtos.PessoaRequestDto;
-import com.projeto.pdi.dtos.PessoaResponseDto;
-import com.projeto.pdi.models.Pessoa;
-import com.projeto.pdi.repositories.PessoaRepository;
-import com.projeto.pdi.repositories.UserRepository;
-import com.projeto.pdi.validation.PessoaValidator;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.projeto.pdi.dtos.PessoaRequestDto;
+import com.projeto.pdi.dtos.PessoaResponseDto;
+import com.projeto.pdi.models.Pessoa;
+import com.projeto.pdi.models.User;
+import com.projeto.pdi.repositories.PessoaRepository;
+import com.projeto.pdi.security.AuthenticatedUser;
+import com.projeto.pdi.services.HistoricoService;
+import com.projeto.pdi.validation.PessoaValidator;
 
 @RestController
 @RequestMapping("/pessoas")
@@ -25,7 +35,10 @@ public class PessoaController {
     private PessoaRepository pessoaRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private HistoricoService historicoService;
+
+    @Autowired
+    private AuthenticatedUser authenticatedUser;
 
     @PostMapping
     public ResponseEntity<Object> createPessoa(@RequestBody PessoaRequestDto dto) {
@@ -35,12 +48,16 @@ public class PessoaController {
         Pessoa pessoa = new Pessoa();
         BeanUtils.copyProperties(normalizar(dto), pessoa);
 
-        userRepository.findById(dto.criadoPorId()).ifPresent(user -> {
-            pessoa.setCriadoPor(user.getId().intValue());
-        });
+        User usuario = authenticatedUser.getUsuarioLogado();
+        pessoa.setCriadoPor(usuario.getId().intValue());
 
-        Pessoa saved = pessoaRepository.save(pessoa);
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapToResponse(saved));
+        Pessoa saved = pessoaRepository.saveAndFlush(pessoa);
+        PessoaResponseDto response = mapToResponse(saved);
+
+        // Log: criação não tem "antes", só "depois"
+        historicoService.registrar(saved, usuario.getId(), HistoricoService.CREATE, null, response);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
@@ -54,14 +71,19 @@ public class PessoaController {
         if (erro != null) return erro;
 
         Pessoa pessoa = pessoaOptional.get();
+        PessoaResponseDto antes = mapToResponse(pessoa); // snapshot ANTES de aplicar as mudanças
+
         BeanUtils.copyProperties(normalizar(dto), pessoa, "id", "createdAt");
 
-        userRepository.findById(dto.criadoPorId()).ifPresent(user -> {
-            pessoa.setAtualizadoPor(user.getId().intValue());
-        });
+        User usuario = authenticatedUser.getUsuarioLogado();
+        pessoa.setAtualizadoPor(usuario.getId().intValue());
 
-        Pessoa updated = pessoaRepository.save(pessoa);
-        return ResponseEntity.ok(mapToResponse(updated));
+        Pessoa updated = pessoaRepository.saveAndFlush(pessoa);
+        PessoaResponseDto depois = mapToResponse(updated);
+
+        historicoService.registrar(updated, usuario.getId(), HistoricoService.UPDATE, antes, depois);
+
+        return ResponseEntity.ok(depois);
     }
 
     @GetMapping
@@ -81,14 +103,21 @@ public class PessoaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
-        if (!pessoaRepository.existsById(id)) {
+        Optional<Pessoa> pessoaOptional = pessoaRepository.findById(id);
+        if (pessoaOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
         }
+
+        Pessoa pessoa = pessoaOptional.get();
+        PessoaResponseDto antes = mapToResponse(pessoa);
+        User usuario = authenticatedUser.getUsuarioLogado();
+
+        historicoService.registrar(pessoa, usuario.getId(), HistoricoService.DELETE, antes, null);
+
         pessoaRepository.deleteById(id);
         return ResponseEntity.ok("Removido com sucesso");
     }
 
-    // Retorna 400/409 com os erros por campo ({ "erros": { "cpf": "..." } }), ou null se os dados forem válidos
     private ResponseEntity<Object> validar(PessoaRequestDto dto, Long idAtual) {
         Map<String, String> erros = PessoaValidator.validar(dto);
         if (!erros.isEmpty()) {
@@ -97,7 +126,6 @@ public class PessoaController {
 
         String cpf = PessoaValidator.formatarCpf(dto.cpf());
         if (cpf != null) {
-            // Compara com e sem pontuação, pois registros antigos podem ter sido gravados sem máscara
             List<String> formatos = List.of(cpf, PessoaValidator.somenteDigitosOuNulo(cpf));
             if (pessoaRepository.existsByCpfInAndIdNot(formatos, idAtual == null ? -1L : idAtual)) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -107,7 +135,6 @@ public class PessoaController {
         return null;
     }
 
-    // Padroniza os documentos antes de gravar (CPF com máscara, CNH só dígitos, RG/passaporte em maiúsculas)
     private PessoaRequestDto normalizar(PessoaRequestDto dto) {
         return new PessoaRequestDto(
                 PessoaValidator.textoOuNulo(dto.nome()),
