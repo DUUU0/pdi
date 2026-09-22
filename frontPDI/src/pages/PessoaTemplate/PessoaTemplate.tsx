@@ -15,6 +15,10 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
     const [biometria, setBiometria] = useState<any>({});
 
     const [editModal, setEditModal] = useState<{ open: boolean; type: string }>({ open: false, type: '' });
+    
+    // Novos estados para a geração de imagem por IA
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
     const loadAllData = async () => {
         try {
@@ -53,6 +57,61 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
         }
     };
 
+    // Chave opcional (https://enter.pollinations.ai/keys) definida em .env.local; sem ela, usa o endpoint anônimo
+    const POLLINATIONS_KEY = import.meta.env.VITE_POLLINATIONS_KEY as string | undefined;
+
+    const handleGenerateImage = async () => {
+        setIsGenerating(true);
+        try {
+            const prompt = `Retrato hiper-realista, fotografia de documento de identificação (RG), fundo branco neutro, iluminação plana de estúdio, olhando diretamente para a câmera. 
+            Gênero: ${caracteristicas.genero || 'não especificado'}, 
+            Etnia: ${caracteristicas.raca || 'não especificada'}, 
+            Biotipo: ${caracteristicas.biotipo || 'não especificado'}, 
+            Cabelo: ${caracteristicas.cabelo || 'não especificado'}. 
+            ${anomalias.fisica ? 'Detalhe facial: ' + anomalias.fisica : ''}. Sem sorrir, expressão neutra.`;
+
+            // Pollinations.ai: o prompt vai na própria URL e a resposta é a imagem em si
+            const encodedPrompt = encodeURIComponent(prompt.replace(/\s+/g, ' ').trim());
+            const params = new URLSearchParams({
+                width: '768',
+                height: '1024',
+                nologo: 'true',
+                seed: String(Math.floor(Math.random() * 1_000_000)),
+            });
+            const url = POLLINATIONS_KEY
+                ? `https://gen.pollinations.ai/image/${encodedPrompt}?${params}`
+                : `https://image.pollinations.ai/prompt/${encodedPrompt}?${params}`;
+
+            const response = await fetch(url, {
+                headers: POLLINATIONS_KEY ? { Authorization: `Bearer ${POLLINATIONS_KEY}` } : undefined,
+            });
+
+            const contentType = response.headers.get('content-type') ?? '';
+            if (!response.ok || !contentType.startsWith('image/')) {
+                // Em caso de erro, o serviço responde com JSON ou texto em vez da imagem
+                const errorText = await response.text();
+                console.error('Erro detalhado da API:', response.status, errorText);
+                throw new Error(`Falha na resposta da API (${response.status}): ${errorText.slice(0, 200) || 'Erro desconhecido'}`);
+            }
+
+            // Converte para data URL, mantendo o mesmo formato usado antes em generatedImage
+            const blob = await response.blob();
+            const dataUrl = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(blob);
+            });
+            setGeneratedImage(dataUrl);
+
+        } catch (error) {
+            console.error('Erro ao gerar imagem com IA:', error);
+            alert('Falha ao gerar retrato. Verifique o console para mais detalhes.');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.templateWindow}>
@@ -68,6 +127,7 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
 
                     {/* SEÇÃO 1: DADOS PESSOAIS */}
                     <section className={styles.infoCard}>
+                        {/* ... Código anterior mantido ... */}
                         <div className={styles.cardHeader}>
                             <h3>Dados Pessoais</h3>
                             <button className={styles.editLink} onClick={() => openEdit('pessoa')}>Editar</button>
@@ -85,6 +145,7 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
 
                     {/* SEÇÃO 2: CARACTERÍSTICAS FÍSICAS */}
                     <section className={styles.infoCard}>
+                        {/* ... Código anterior mantido ... */}
                         <div className={styles.cardHeader}>
                             <h3>Características Físicas</h3>
                             <button className={styles.editLink} onClick={() => openEdit('caracteristicas')}>Editar</button>
@@ -109,7 +170,18 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
                     <section className={styles.infoCard}>
                         <div className={styles.cardHeader}>
                             <h3>Biometria Facial</h3>
-                            <button className={styles.editLink} onClick={() => openEdit('biometria')}>Atualizar Fotos</button>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                {/* NOVO BOTÃO DE IA AQUI */}
+                                <button 
+                                    className={styles.editLink} 
+                                    onClick={handleGenerateImage} 
+                                    disabled={isGenerating}
+                                    style={{ backgroundColor: '#f0f4ff', color: '#0056b3', border: '1px solid #cce5ff' }}
+                                >
+                                    {isGenerating ? 'Gerando IA...' : 'Gerar Retrato via IA'}
+                                </button>
+                                <button className={styles.editLink} onClick={() => openEdit('biometria')}>Atualizar Fotos</button>
+                            </div>
                         </div>
                         <div className={styles.biometriaGrid}>
                             <div className={styles.photoBox}>
@@ -130,11 +202,20 @@ const PessoaTemplate: React.FC<Props> = ({ pessoa, onClose }) => {
                                     ? <img src={biometria.faceDir} alt="Direita" />
                                     : <div className={styles.noPhoto}>N/A</div>}
                             </div>
+                            
+                            {/* RENDERIZAÇÃO DA IMAGEM GERADA PELA IA */}
+                            {generatedImage && (
+                                <div className={styles.photoBox} style={{ borderColor: '#0056b3' }}>
+                                    <span style={{ color: '#0056b3', fontWeight: 'bold' }}>Retrato IA</span>
+                                    <img src={generatedImage} alt="Retrato Gerado" />
+                                </div>
+                            )}
                         </div>
                     </section>
 
                     {/* SEÇÃO 4: ANOMALIAS */}
                     <section className={styles.infoCard}>
+                        {/* ... Código anterior mantido ... */}
                         <div className={styles.cardHeader}>
                             <h3>Anomalias e Observações</h3>
                             <button className={styles.editLink} onClick={() => openEdit('anomalias')}>Editar</button>
